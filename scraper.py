@@ -10,15 +10,26 @@ os.environ["BROWSERBASE_API_KEY"] = "BROWSERBASE_API_KEY"
 os.environ["BROWSERBASE_PROJECT_ID"] = "BROWSERBASE_PROJECT_ID"
 
 async def quick_scrape(pid):
+
+    # initialize instance of stagehand
     stagehand = Stagehand()
 
-    # Example: Sending a POST request to create a new browser session
-    response = await stagehand.post("/browser/sessions", json={"permit_id": pid})
-    print(response)
+    page = stagehand.pages()[0]
 
-    # Example: Sending a GET request to retrieve data
-    data = await stagehand.get("/browser/data")
-    print(data)
+    await page.goto("https://stagehand.dev")
+    
+    # Navigate and interact with the page
+    await page.act("https://sfdbi.org/dbipts")  
+    await page.act({"permit_search": pid})  
+    
+    # 3. Extract specific data for your Knowledge Graph
+    result = await page.extract({
+        "status": "the current status of the permit",
+        "description": "a brief description of the permit",
+        "valuation": "the valuation of the permit"
+    })
+    
+    return result
 
 if __name__ == "__main__":
     try:
